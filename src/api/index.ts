@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { Movie } from '../types';
 
-const BASE_URL = 'http://locahost:3001'
+const BASE_URL = '/api';
 
 export const getMovies = async (): Promise<Movie[]> => {
 
