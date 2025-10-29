@@ -4,38 +4,31 @@ import InputText from '../InputText'
 import Button from '../Button'
 import { FaSearch } from 'react-icons/fa'
 import MovieList from '../MovieList'
-import type { Movie } from '../../types'
-import { useEffect, useState } from 'react'
-import { getMovies } from '../../api'
+import useFetchMovies from '../../hooks/useFetchMovies'
+import useFilterMovies from '../../hooks/useFilterMovies'
 
 const MovieSection = () => {
 
-    const [movies, setMovies] = useState<Movie[]>([]);
-
-    const fetchMovies = async () => {
-        try {
-            const movies = await getMovies();
-            setMovies(movies);
-        } catch(err) {
-            console.error("Erro ao buscar filmes" + err);
-        }
-    }
-
-    useEffect(() => {
-        fetchMovies();
-    })
+    const { movies, error, isLoading } = useFetchMovies();
+    const { searchTerm, handleSearch, setSearchTerm, filteredMovies } = useFilterMovies(movies)
 
     return (
         <main>
             <section className={styles.container}>
                 <FieldSet variant='secondary'>
-                    <InputText placeholder='Buscar filmes...' />
-                    <Button variant='icon'>
+                    <InputText
+                        value={searchTerm}
+                        placeholder='Buscar filmes...'
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value)}
+                    />
+                    <Button variant='icon' onClick={handleSearch}>
                         <FaSearch />
                     </Button>
                 </FieldSet>
                 <h1 className={styles.titulo}>Em cartaz</h1>
-                <MovieList movies={movies} />
+                {isLoading && <p>Carregando filmes...</p>}
+                {error && <p className={styles.error}>{error}</p>}
+                <MovieList movies={filteredMovies} />
             </section>
         </main>
     )
